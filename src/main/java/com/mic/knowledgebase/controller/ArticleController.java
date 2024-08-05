@@ -3,6 +3,8 @@ package com.mic.knowledgebase.controller;
 import com.mic.knowledgebase.model.Article;
 import com.mic.knowledgebase.service.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,14 @@ public class ArticleController {
     private ArticleService articleService;
 
     @GetMapping
-    public List<Article> getAllArticles() {
-        return articleService.getAllArticles();
+    public ResponseEntity<Page<Article>> getAllArticles(Pageable pageable) {
+        return ResponseEntity.ok(articleService.getAllArticles(pageable));
     }
+
+    // @GetMapping
+    // public List<Article> getAllArticles() {
+    // return articleService.getAllArticles();
+    // }
 
     @GetMapping("/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable Long id) {

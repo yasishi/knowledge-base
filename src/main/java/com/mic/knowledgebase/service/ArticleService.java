@@ -5,6 +5,8 @@ import com.mic.knowledgebase.repository.ArticleRepository;
 import com.mic.knowledgebase.util.LogUtil;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -16,6 +18,11 @@ public class ArticleService {
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    public Page<Article> getAllArticles(Pageable pageable) {
+        LogUtil.info("Fetching articles page: " + pageable.getPageNumber() + ", size: " + pageable.getPageSize());
+        return articleRepository.findAll(pageable);
+    }
 
     public List<Article> getAllArticles() {
         LogUtil.info("Fetching all articles");

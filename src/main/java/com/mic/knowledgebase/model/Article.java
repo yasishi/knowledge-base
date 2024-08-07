@@ -1,31 +1,45 @@
 package com.mic.knowledgebase.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
+
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
 @Data
-@Entity
+@DynamoDBTable(tableName = "Article")
 public class Article {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    @NotBlank(message = "Title is required")
-    @Size(max = 100, message = "Title must be less than 100 characters")
+    @Id
+    @DynamoDBHashKey
+    private String id;
+
+    @DynamoDBAttribute
     private String title;
 
-    @NotBlank(message = "Content is required")
-    @Column(columnDefinition = "TEXT")
+    @DynamoDBAttribute
     private String content;
 
+    @DynamoDBAttribute
     private LocalDateTime createdAt;
+
+    @DynamoDBAttribute
     private LocalDateTime updatedAt;
+
+    // デフォルトコンストラクタ
+    public Article() {
+    }
+
+    // 全フィールドを含むコンストラクタ
+    public Article(String id, String title, String content, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    // ゲッターとセッター
+    // ... (省略)
 }

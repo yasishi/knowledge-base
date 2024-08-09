@@ -2,6 +2,9 @@ package com.mic.knowledgebase.controller;
 
 import com.mic.knowledgebase.model.Article;
 import com.mic.knowledgebase.service.ArticleService;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +16,23 @@ import java.util.List;
 @RequestMapping("/api/articles")
 public class ArticleController {
 
+    private static final Logger logger = LoggerFactory.getLogger(ArticleController.class);
+
     @Autowired
     private ArticleService articleService;
 
     @GetMapping
     public ResponseEntity<List<Article>> getAllArticles() {
-        return ResponseEntity.ok(articleService.getAllArticles());
+        logger.debug("Fetching all articles");
+        // return ResponseEntity.ok(articleService.getAllArticles());
+        try {
+            List<Article> articles = articleService.getAllArticles();
+            logger.debug("Found {} articles", articles.size());
+            return ResponseEntity.ok(articles);
+        } catch (Exception e) {
+            logger.error("Error fetching articles", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @GetMapping("/{id}")

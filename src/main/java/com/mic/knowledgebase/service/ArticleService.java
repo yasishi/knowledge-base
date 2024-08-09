@@ -2,6 +2,9 @@ package com.mic.knowledgebase.service;
 
 import com.mic.knowledgebase.model.Article;
 import com.mic.knowledgebase.repository.ArticleRepository;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +17,20 @@ import java.util.UUID;
 @Service
 public class ArticleService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ArticleService.class);
+
     @Autowired
     private ArticleRepository articleRepository;
 
     public List<Article> getAllArticles() {
+        logger.debug("Fetching all articles from repository");
         List<Article> articles = new ArrayList<>();
-        articleRepository.findAll().forEach(articles::add);
+        try {
+            articleRepository.findAll().forEach(articles::add);
+            logger.debug("Found {} articles", articles.size());
+        } catch (Exception e) {
+            logger.error("Error fetching articles from repository", e);
+        }
         return articles;
     }
 

@@ -1,5 +1,7 @@
 package com.mic.knowledgebase.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -15,6 +17,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableDynamoDBRepositories(basePackages = "com.mic.knowledgebase.repository")
 public class DynamoDBConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(DynamoDBConfig.class);
+
     @Value("${amazon.dynamodb.endpoint}")
     private String amazonDynamoDBEndpoint;
 
@@ -29,14 +33,17 @@ public class DynamoDBConfig {
 
     @Bean
     public AmazonDynamoDB amazonDynamoDB() {
+        logger.debug("Configuring AmazonDynamoDB with endpoint: {}", amazonDynamoDBEndpoint);
         return AmazonDynamoDBClientBuilder.standard()
-            .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration(amazonDynamoDBEndpoint, amazonAWSRegion))
-            .withCredentials(new AWSStaticCredentialsProvider(amazonAWSCredentials()))
-            .build();
+                .withEndpointConfiguration(
+                        new AwsClientBuilder.EndpointConfiguration(amazonDynamoDBEndpoint, amazonAWSRegion))
+                .withCredentials(new AWSStaticCredentialsProvider(amazonAWSCredentials()))
+                .build();
     }
 
     @Bean
     public AWSCredentials amazonAWSCredentials() {
+        logger.debug("Creating AWSCredentials");
         return new BasicAWSCredentials(amazonAWSAccessKey, amazonAWSSecretKey);
     }
 }

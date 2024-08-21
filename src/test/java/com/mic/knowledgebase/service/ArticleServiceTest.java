@@ -1,5 +1,8 @@
 package com.mic.knowledgebase.service;
 
+import com.amazonaws.AmazonServiceException;
+import com.mic.knowledgebase.exception.ArticleNotFoundException;
+import com.mic.knowledgebase.exception.DatabaseOperationException;
 import com.mic.knowledgebase.model.Article;
 import com.mic.knowledgebase.repository.ArticleRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,14 +46,27 @@ class ArticleServiceTest {
     }
 
     @Test
+    void getAllArticles_DatabaseOperationException() {
+        when(articleRepository.findAll()).thenThrow(new AmazonServiceException("Database error"));
+
+        assertThrows(DatabaseOperationException.class, () -> articleService.getAllArticles());
+    }
+
+    @Test
     void getArticleById() {
         Article article = new Article("1", "Title", "Content", LocalDateTime.now(), LocalDateTime.now());
         when(articleRepository.findById("1")).thenReturn(Optional.of(article));
 
-        Optional<Article> result = articleService.getArticleById("1");
+        Article result = articleService.getArticleById("1");
 
-        assertTrue(result.isPresent());
-        assertEquals("1", result.get().getId());
+        assertEquals("1", result.getId());
+    }
+
+    @Test
+    void getArticleById_NotFound() {
+        when(articleRepository.findById("1")).thenReturn(Optional.empty());
+
+        assertThrows(ArticleNotFoundException.class, () -> articleService.getArticleById("1"));
     }
 
     @Test
@@ -68,28 +84,50 @@ class ArticleServiceTest {
     }
 
     @Test
+    void createArticle_DatabaseOperationException() {
+        Article article = new Article(null, "New Title", "New Content", null, null);
+        when(articleRepository.save(any(Article.class))).thenThrow(new AmazonServiceException("Database error"));
+
+        assertThrows(DatabaseOperationException.class, () -> articleService.createArticle(article));
+    }
+
+    @Test
     void updateArticle() {
         Article existingArticle = new Article("1", "Old Title", "Old Content", LocalDateTime.now(),
                 LocalDateTime.now());
         Article updatedArticle = new Article("1", "Updated Title", "Updated Content", existingArticle.getCreatedAt(),
                 LocalDateTime.now());
-
         when(articleRepository.findById("1")).thenReturn(Optional.of(existingArticle));
         when(articleRepository.save(any(Article.class))).thenReturn(updatedArticle);
 
-        Optional<Article> result = articleService.updateArticle("1", updatedArticle);
+        Article result = articleService.updateArticle("1", updatedArticle);
 
-        assertTrue(result.isPresent());
-        assertEquals("Updated Title", result.get().getTitle());
-        assertEquals("Updated Content", result.get().getContent());
+        assertEquals("Updated Title", result.getTitle());
+        assertEquals("Updated Content", result.getContent());
+    }
+
+    @Test
+    void updateArticle_NotFound() {
+        Article updatedArticle = new Article("1", "Updated Title", "Updated Content", LocalDateTime.now(),
+                LocalDateTime.now());
+        when(articleRepository.findById("1")).thenReturn(Optional.empty());
+
+        assertThrows(ArticleNotFoundException.class, () -> articleService.updateArticle("1", updatedArticle));
     }
 
     @Test
     void deleteArticle() {
+        when(articleRepository.existsById("1")).thenReturn(true);
         doNothing().when(articleRepository).deleteById("1");
 
-        articleService.deleteArticle("1");
-
+        assertDoesNotThrow(() -> articleService.deleteArticle("1"));
         verify(articleRepository, times(1)).deleteById("1");
+    }
+
+    @Test
+    void deleteArticle_NotFound() {
+        when(articleRepository.existsById("1")).thenReturn(false);
+
+        assertThrows(ArticleNotFoundException.class, () -> articleService.deleteArticle("1"));
     }
 }

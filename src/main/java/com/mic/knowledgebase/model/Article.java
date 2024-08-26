@@ -3,6 +3,8 @@ package com.mic.knowledgebase.model;
 import lombok.Data;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
@@ -10,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
 @Data
-@DynamoDBTable(tableName = "Article")
+@DynamoDBTable(tableName = "Articles")
 public class Article {
 
     @Id
@@ -18,6 +20,7 @@ public class Article {
     private String id;
 
     @DynamoDBAttribute
+    @DynamoDBIndexHashKey(globalSecondaryIndexName = "TitleIndex")
     private String title;
 
     @DynamoDBAttribute
@@ -25,10 +28,12 @@ public class Article {
 
     @DynamoDBTypeConverted(converter = LocalDateTimeConverter.class)
     @DynamoDBAttribute
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime createdAt;
 
     @DynamoDBTypeConverted(converter = LocalDateTimeConverter.class)
     @DynamoDBAttribute
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
     private LocalDateTime updatedAt;
 
     // デフォルトコンストラクタ

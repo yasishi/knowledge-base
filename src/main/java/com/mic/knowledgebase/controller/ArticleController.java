@@ -58,6 +58,7 @@ public class ArticleController {
     @GetMapping("/{id}")
     public ResponseEntity<Article> getArticleById(@PathVariable String id) {
         try {
+            logger.debug("Fetching article id: {}", id);
             Article article = articleService.getArticleById(id);
             return ResponseEntity.ok(article);
         } catch (ArticleNotFoundException e) {

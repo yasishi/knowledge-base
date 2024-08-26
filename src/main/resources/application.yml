@@ -1,0 +1,96 @@
+spring:
+  application:
+    name: knowledgebase
+  data:
+    rest:
+      base-path: /api
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: UTC
+
+amazon:
+  aws:
+    region: ap-northeast-1
+
+logging:
+  level:
+    root: INFO
+    com:
+      mic:
+        knowledgebase: INFO
+    org:
+      springframework:
+        web: INFO
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+amazon:
+  dynamodb:
+    endpoint: http://localhost:8000
+  aws:
+    accesskey: dummy
+    secretkey: dummy
+
+logging:
+  level:
+    com:
+      amazonaws:
+        services:
+          dynamodbv2: DEBUG
+        auth: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  cloud:
+    function:
+      definition: mainLambdaFunction
+
+  main:
+    lazy-initialization: true
+    banner-mode: off
+  jmx:
+    enabled: false
+
+amazon:
+  aws:
+    use-iam-role: true
+#   dynamodb:
+#     endpoint: ${DYNAMODB_ENDPOINT}
+
+logging:
+  level:
+    root: WARN
+    com:
+      mic:
+        knowledgebase: INFO
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+app:
+  feature:
+    example-feature-flag: true
+  security:
+    allowed-origins: http://localhost:3000

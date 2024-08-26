@@ -21,7 +21,7 @@ public class DynamoDBTableCreator {
                     .withAttributeDefinitions(new AttributeDefinition("id", ScalarAttributeType.S))
                     .withKeySchema(new KeySchemaElement("id", KeyType.HASH))
                     .withProvisionedThroughput(new ProvisionedThroughput(5L, 5L))
-                    .withTableName("Article");
+                    .withTableName("Articles");
 
             amazonDynamoDB.createTable(createTableRequest);
 

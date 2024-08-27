@@ -7,6 +7,9 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: UTC
+  web:
+    resources:
+      static-locations: classpath:/static/
 
 amazon:
   aws:
@@ -17,7 +20,7 @@ logging:
     root: INFO
     com:
       mic:
-        knowledgebase: INFO
+        knowledgebase: DEBUG
     org:
       springframework:
         web: INFO

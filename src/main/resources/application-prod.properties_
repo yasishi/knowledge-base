@@ -1,2 +1,0 @@
-# DynamoDB設定（本番環境用）
-amazon.aws.use-iam-role=true

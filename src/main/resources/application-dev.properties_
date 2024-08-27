@@ -1,4 +1,0 @@
-# DynamoDB設定（開発環境用）
-amazon.dynamodb.endpoint=http://localhost:8000
-amazon.aws.accesskey=dummy
-amazon.aws.secretkey=dummy
